@@ -13,8 +13,6 @@ data = pd.read_csv("altura_peso.csv", sep=",")
 x = data["Altura"].values
 y = data["Peso"].values
 
-print(y)
-
 #### IMPLEMENTACION DEL MODELO KERAS
 
 # Se crea el contenedor o modelo de keras
@@ -32,16 +30,33 @@ input_dim = 1
 modelo.add(Dense(output_dim, input_dim = input_dim, activation="linear" ))
 
 # Se define el método que usará el entrenamiento
-sgd = SGD(learning_rate=0.0004)
-modelo.compile(loss="mse", optimizer=sgd)
-
-
-modelo.summary()
+modelo.compile(loss="mse", optimizer=SGD(learning_rate=0.0004))
 
 #### ENTRENAMIENTO DEL MODELO
 
 # Cantidad de iteraciones
-cant_epochs = 10000
+cant_epochs = 1000
 # Cantidad de datos a utilizar
 batch_size = x.shape[0]
 historia = modelo.fit(x, y, epochs=cant_epochs, batch_size = batch_size, verbose = 1)
+
+#### VISUALIZACION DE RESULTADOS
+
+capas = modelo.layers[0]
+w, b = capas.get_weights()
+print("Parámetros: ", w[0][0], ", ", b[0])
+
+loss = historia.history["loss"]
+
+plt.subplot(1,2,1)
+plt.plot(loss)
+plt.xlabel("epoch")
+plt.ylabel("ECM")
+plt.title("ECM vs Epochs")
+
+y_reg = modelo.predict(x)
+plt.subplot(1,2,2)
+plt.scatter(x,y)
+plt.plot(x,y_reg, "r")
+plt.title("Datos originales y regresion lineal")
+plt.show()
